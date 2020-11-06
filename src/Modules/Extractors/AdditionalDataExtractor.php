@@ -22,30 +22,6 @@ class AdditionalDataExtractor extends AbstractModule implements ModuleInterface
 	/** @var string */
 	protected static $A_REL_TAG_SELECTOR = "a[rel='tag'], a[href*='/tag/']";
 
-	/** @var string[] */
-	protected static $VIDEO_PROVIDERS = [
-		'youtube\.com',
-		'youtu\.be',
-		'vimeo\.com',
-		'blip\.tv',
-		'dailymotion\.com',
-		'dai\.ly',
-		'flickr\.com',
-		'flic\.kr',
-	];
-
-	/** @var string[] */
-	protected static $VIDEO_EXTENSIONS = [
-		'mpg',
-		'mp4',
-		'avi',
-		'flv',
-		'mov',
-		'wmv',
-		'ogv',
-		'gifv',
-		'mpeg',
-	];
 
 	/** @inheritdoc */
 	public function run(Article $article): self
@@ -88,49 +64,7 @@ class AdditionalDataExtractor extends AbstractModule implements ModuleInterface
 	 */
 	private function getVideos(): array
 	{
-		$videos = [];
-
-		$topNode = $this->article()->getTopNode();
-
-		if($topNode instanceof Element && $topNode->parent() instanceof Element)
-		{
-			$nodes = $topNode->parent()->find('embed, object, iframe, video');
-
-			foreach($nodes as $node)
-			{
-				if($node->hasAttribute('src'))
-				{
-					$src = $node->attr('src');
-				}
-				else
-				{
-					$src = $node->attr('data');
-				}
-
-				$match = array_reduce(self::$VIDEO_PROVIDERS, function($match, $domain) use ($src)
-				{
-					$srcHost = (string)parse_url($src, PHP_URL_HOST);
-					$srcScheme = (string)parse_url($src, PHP_URL_SCHEME);
-
-					return $match || preg_match('@' . $domain . '$@i', $srcHost) && in_array($srcScheme, ['http', 'https']);
-				});
-
-				if(!$match)
-				{
-					$srcPath = parse_url(strtolower($src), PHP_URL_PATH);
-					$srcExtension = pathinfo((string)$srcPath, PATHINFO_EXTENSION);
-
-					$match = in_array($srcExtension, self::$VIDEO_EXTENSIONS);
-				}
-
-				if($match)
-				{
-					$videos[] = $src;
-				}
-			}
-		}
-
-		return $videos;
+		return [];
 	}
 
 	/**

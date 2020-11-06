@@ -2,13 +2,15 @@
 
 namespace Goose;
 
+use DOMWrap\Document;
+
 /**
  * Client
  *
  * @package Goose
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
  */
-class Client extends Crawler
+class Client
 {
 	/** @var Configuration */
 	protected $config;
@@ -35,6 +37,27 @@ class Client extends Crawler
 		}
 
 		return NULL;
+	}
+
+	protected function getDocument(string $rawHTML): Document
+	{
+		$doc = new Document();
+		$doc->html($rawHTML);
+
+		return $doc;
+	}
+
+	public function modules(string $category, Article $article): self
+	{
+		$modules = $this->config->getModules($category);
+
+		foreach($modules as $module)
+		{
+			$obj = new $module($this->config);
+			$obj->run($article);
+		}
+
+		return $this;
 	}
 
 	public function extractContent(string $raw_html): Article
