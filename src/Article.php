@@ -268,56 +268,6 @@ class Article
 	}
 
 	/**
-	 * Top Image object that we think represents this article
-	 *
-	 * @var Image|null
-	 */
-	protected $topImage;
-
-	/**
-	 * @param Image|null $topImage
-	 *
-	 * @return self
-	 */
-	public function setTopImage(Image $topImage = NULL): self
-	{
-		$this->topImage = $topImage;
-
-		return $this;
-	}
-
-	/** @return Image|null */
-	public function getTopImage(): ?Image
-	{
-		return $this->topImage;
-	}
-
-	/**
-	 * All image candidates from article
-	 *
-	 * @var Image[]
-	 */
-	protected $allImages = [];
-
-	/**
-	 * @param Image[] $allImages
-	 *
-	 * @return self
-	 */
-	public function setAllImages(array $allImages = []): self
-	{
-		$this->allImages = $allImages;
-
-		return $this;
-	}
-
-	/** @return Image[] */
-	public function getAllImages(): array
-	{
-		return $this->allImages;
-	}
-
-	/**
 	 * Tags that may have been in the article, these are not meta keywords
 	 *
 	 * @var string[]
@@ -366,60 +316,8 @@ class Article
 	{
 		return $this->links;
 	}
-
 	/**
-	 * List of any videos we found on the page like youtube, vimeo
-	 *
-	 * @var string[]
-	 */
-	protected $videos = [];
-
-	/**
-	 * @param string[] $videos
-	 *
-	 * @return self
-	 */
-	public function setVideos(array $videos): self
-	{
-		$this->videos = $videos;
-
-		return $this;
-	}
-
-	/** @return string[] */
-	public function getVideos(): array
-	{
-		return $this->videos;
-	}
-
-	/**
-	 * Final URL that we're going to try and fetch content against, this would be expanded if any
-	 * escaped fragments were found in the starting url
-	 *
-	 * @var string|null
-	 */
-	protected $finalUrl;
-
-	/**
-	 * @param string $finalUrl
-	 *
-	 * @return self
-	 */
-	public function setFinalUrl(string $finalUrl = NULL): self
-	{
-		$this->finalUrl = $finalUrl;
-
-		return $this;
-	}
-
-	/** @return string|null */
-	public function getFinalUrl(): ?string
-	{
-		return $this->finalUrl;
-	}
-
-	/**
-	 * MD5 hash of the url to use for various identification tasks
+	 * SHA1 hash of the url to use for various identification tasks
 	 *
 	 * @var string|null
 	 */
