@@ -19,13 +19,6 @@ class ContentExtractor extends AbstractModule implements ModuleInterface
 {
 	use ArticleMutatorTrait, NodeGravityTrait, NodeCommonTrait;
 
-	const MIN_STOP_WORD_COUNT   = 2;    // default: 2
-	const BOOST_SCORE_FACTOR    = 50;   // default: 50, try 20
-	const TOTAL_NODE_MOD        = 0.25; // default: 0.25
-	const MIN_NEGATIVE_SCORE    = 40;   // default: 40
-	const BOOST_SCORE_INCREMENT = 5;    // default: 5
-
-
 	/** @inheritdoc */
 	public function run(Article $article): self
 	{
@@ -52,7 +45,7 @@ class ContentExtractor extends AbstractModule implements ModuleInterface
 			$wordStats = $this->config()->getStopWords()->getStopwordCount($node->text());
 			$highLinkDensity = $this->isHighLinkDensity($node);
 
-			if($wordStats->getStopWordCount() > self::MIN_STOP_WORD_COUNT && !$highLinkDensity)
+			if($wordStats->getStopWordCount() > $this->config()->get('content_extractor.min_stopword_count_addnode') && !$highLinkDensity)
 			{
 				$results[] = $node;
 			}
@@ -70,19 +63,19 @@ class ContentExtractor extends AbstractModule implements ModuleInterface
 	 */
 	private function getTopNodeCandidateScore(Element $node, int $i, int $totalNodes): float
 	{
-		$boostScore = (1.0 / ($i + 1)) * self::BOOST_SCORE_FACTOR;
-		$bottomNodesForNegativeScore = $totalNodes * self::TOTAL_NODE_MOD;
+		$boostScore = (1.0 / ($i + 1)) * $this->config()->get('content_extractor.boost_score_factor');
+		$bottomNodesForNegativeScore = $totalNodes * $this->config()->get('content_extractor.total_node_mod');
 
-		if($totalNodes > 15)
+		if($totalNodes > $this->config()->get('content_extractor.min_nodes'))
 		{
 			if($totalNodes - $i <= $bottomNodesForNegativeScore)
 			{
 				$booster = $bottomNodesForNegativeScore - ($totalNodes - $i);
 				$boostScore = pow($booster, 2) * -1;
 				$negscore = abs($boostScore);
-				if($negscore > self::MIN_NEGATIVE_SCORE)
+				if($negscore > $this->config()->get('content_extractor.min_negative_score'))
 				{
-					$boostScore = self::BOOST_SCORE_INCREMENT;
+					$boostScore = $this->config()->get('content_extractor.score_increment_amount');
 				}
 			}
 		}
@@ -119,7 +112,7 @@ class ContentExtractor extends AbstractModule implements ModuleInterface
 			}
 		}
 
-		if($topNode && $this->getScore($topNode) < 20)
+		if($topNode && $this->getScore($topNode) < $this->config()->get('content_extractor.topnode_min_score'))
 		{
 			return NULL;
 		}
@@ -222,8 +215,8 @@ class ContentExtractor extends AbstractModule implements ModuleInterface
 	private function isOkToBoost(Element $node): bool
 	{
 		$stepsAway = 0;
-		$minimumStopWordCount = 5;
-		$maxStepsAwayFromNode = 3;
+		$minimumStopWordCount = $this->config()->get('content_extractor.min_stopword_count_boost');
+		$maxStepsAwayFromNode = $this->config()->get('content_extractor.max_steps_away_from_node');
 
 		// Find all previous sibling element nodes
 		$siblings = $node->precedingAll(function($node)

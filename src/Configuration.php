@@ -69,6 +69,8 @@ class Configuration
 			return $this->options[$option];
 		}
 
+		throw new \RuntimeException("Config option not set: '".$option."'");
+
 		return NULL;
 	}
 
