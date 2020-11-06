@@ -2,9 +2,11 @@
 
 namespace Goose\Tests\Utils;
 
+use Goose\Exceptions\MalformedURLException;
 use Goose\Utils\Helper;
+use PHPUnit\Framework\TestCase;
 
-class HelperTest extends \PHPUnit\Framework\TestCase
+class HelperTest extends TestCase
 {
     /**
      * @dataProvider getCleanedUrlProvider
@@ -59,7 +61,7 @@ class HelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetCleanedUrlException()
     {
-        $this->expectException(\Goose\Exceptions\MalformedURLException::class);
+        $this->expectException(MalformedURLException::class);
 
         Helper::getCleanedUrl('http://example.org:port/');
     }

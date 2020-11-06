@@ -3,10 +3,12 @@
 namespace Goose\Tests\Modules\Cleaners;
 
 use Goose\Article;
+use Goose\Tests\Harness\TestTrait;
+use PHPUnit\Framework\TestCase;
 
-class DocumentCleanerTest extends \PHPUnit\Framework\TestCase
+class DocumentCleanerTest extends TestCase
 {
-    use \Goose\Tests\Harness\TestTrait;
+    use TestTrait;
 
     private static $CLASS_NAME = '\Goose\Modules\Cleaners\DocumentCleaner';
 

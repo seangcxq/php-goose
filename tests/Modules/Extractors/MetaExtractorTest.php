@@ -5,10 +5,12 @@ namespace Goose\Tests\Modules\Extractors;
 use Goose\Article;
 use Goose\Configuration;
 use Goose\Modules\Extractors\MetaExtractor;
+use Goose\Tests\Harness\TestTrait;
+use PHPUnit\Framework\TestCase;
 
-class MetaExtractorTest extends \PHPUnit\Framework\TestCase
+class MetaExtractorTest extends TestCase
 {
-    use \Goose\Tests\Harness\TestTrait;
+    use TestTrait;
 
     private static $CLASS_NAME = '\Goose\Modules\Extractors\MetaExtractor';
 

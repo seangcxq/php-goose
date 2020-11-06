@@ -2,11 +2,14 @@
 
 namespace Goose\Tests\Modules\Extractors;
 
+use DateTime;
 use Goose\Article;
+use Goose\Tests\Harness\TestTrait;
+use PHPUnit\Framework\TestCase;
 
-class PublishDateExtractorTest extends \PHPUnit\Framework\TestCase
+class PublishDateExtractorTest extends TestCase
 {
-    use \Goose\Tests\Harness\TestTrait;
+    use TestTrait;
 
     private static $CLASS_NAME = '\Goose\Modules\Extractors\PublishDateExtractor';
 
@@ -29,8 +32,8 @@ class PublishDateExtractorTest extends \PHPUnit\Framework\TestCase
 
     public function getDateFromURLProvider() {
         return [
-            [new \DateTime('2014-03-26'), 'http://example.org/2014/03/26/hello-world', 'Date format: Y/m/d'],
-            [new \DateTime('2014-03-26'), 'http://example.org/2014-03-26/hello-world', 'Date format: Y-m-d'],
+            [new DateTime('2014-03-26'), 'http://example.org/2014/03/26/hello-world', 'Date format: Y/m/d'],
+            [new DateTime('2014-03-26'), 'http://example.org/2014-03-26/hello-world', 'Date format: Y-m-d'],
             [null, 'http://example.org/folder/2014-203-2a6/hello-world', 'Date format: Invalid #1'],
             [null, 'http://example.org/folder/2014-03/26/hello-world', 'Date format: Invalid #2'],
         ];
@@ -55,27 +58,27 @@ class PublishDateExtractorTest extends \PHPUnit\Framework\TestCase
     public function getDateFromSchemaOrgProvider() {
         return [
             [
-                new \DateTime('2016-05-31T22:52:11Z'),
+                new DateTime('2016-05-31T22:52:11Z'),
                 $this->document('<html><head><title>Example Article</title><meta itemprop="datePublished" content="2016-05-31T22:52:11Z"></head></html>'),
                 'Valid date with tag: <meta> and attribute: "content"'
             ],
             [
-                new \DateTime('2016-05-31T22:52:11Z'),
+                new DateTime('2016-05-31T22:52:11Z'),
                 $this->document('<html><head><title>Example Article</title><meta itemprop="datePublished" datetime="2016-05-31T22:52:11Z"></head></html>'),
                 'Valid date with tag: <meta> and attribute: "datetime"'
             ],
             [
-                new \DateTime('2016-05-31T22:52:11Z'),
+                new DateTime('2016-05-31T22:52:11Z'),
                 $this->document('<html><head><title>Example Article</title></head><body><article>Content<time itemprop="datePublished" datetime="2016-05-31T22:52:11Z"></article></body></html>'),
                 'Valid date with tag: <time> and attribute: "datetime"'
             ],
             [
-                new \DateTime('2016-05-31'),
+                new DateTime('2016-05-31'),
                 $this->document('<html><head><title>Example Article</title><script type="application/ld+json">{"@context":"http://schema.org","@type":"Article","author":"John Smith","datePublished":"2016-05-31"}</script></head></html>'),
                 'Valid date with JSON-LD and attribute: "datePublished"'
             ],
             [
-                new \DateTime('2016-05-31'),
+                new DateTime('2016-05-31'),
                 $this->document('<html><head><title>Example Article</title><script type="application/ld+json">{"@context":"http://schema.org","@type":"Article","author":"John Smith","datePublished":["2016-05-31"]}</script></head></html>'),
                 'Valid date with JSON-LD and attribute: "datePublished"'
             ],
@@ -111,17 +114,17 @@ class PublishDateExtractorTest extends \PHPUnit\Framework\TestCase
     public function getDateFromDublinCoreProvider() {
         return [
             [
-                new \DateTime('2016-05-31T22:52:11Z'),
+                new DateTime('2016-05-31T22:52:11Z'),
                 $this->document('<html><head><title>Example Article</title><meta name="dc.date" content="2016-05-31T22:52:11Z"></head></html>'),
                 'Valid date with tag: <meta> and name: "dc.date"'
             ],
             [
-                new \DateTime('2016-05-31T22:52:11Z'),
+                new DateTime('2016-05-31T22:52:11Z'),
                 $this->document('<html><head><title>Example Article</title><meta name="dc.date.issued" content="2016-05-31T22:52:11Z"></head></html>'),
                 'Valid date with tag: <meta> and name: "dc.date.issued"'
             ],
             [
-                new \DateTime('2016-05-31T22:52:11Z'),
+                new DateTime('2016-05-31T22:52:11Z'),
                 $this->document('<html><head><title>Example Article</title><meta name="DC.date.issued" content="2016-05-31T22:52:11Z"></head></html>'),
                 'Valid date with tag: <meta> and name: "DC.date.issued"'
             ],
@@ -163,12 +166,12 @@ class PublishDateExtractorTest extends \PHPUnit\Framework\TestCase
 
         return [
             [
-                new \DateTime('2016-05-31T22:52:11Z'),
+                new DateTime('2016-05-31T22:52:11Z'),
                 $pubdate_article,
                 'Valid date with og:pubdate'
             ],
             [
-                new \DateTime('2016-05-31T22:52:11Z'),
+                new DateTime('2016-05-31T22:52:11Z'),
                 $published_time_article,
                 'Valid date with og:article and article:published_time'
             ],
@@ -200,22 +203,22 @@ class PublishDateExtractorTest extends \PHPUnit\Framework\TestCase
     public function getDateFromParselyProvider() {
         return [
             [
-                new \DateTime('2016-05-31T22:52:11Z'),
+                new DateTime('2016-05-31T22:52:11Z'),
                 $this->document('<html><head><title>Example Article</title><script type="application/ld+json">{"@context":"http://schema.org","@type":"NewsArticle","creator":["John Smith"],"dateCreated":"2016-05-31T22:52:11Z"}</script></head></html>'),
                 'Valid date with JSON-LD and attribute: "dateCreated"'
             ],
             [
-                new \DateTime('2016-05-31T22:52:11Z'),
+                new DateTime('2016-05-31T22:52:11Z'),
                 $this->document('<html><head><title>Example Article</title><script type="application/ld+json">{"@context":"http://schema.org","@type":"NewsArticle","creator":["John Smith"],"dateCreated":["2016-05-31T22:52:11Z"]}</script></head></html>'),
                 'Valid date with JSON-LD and attribute: "dateCreated"'
             ],
             [
-                new \DateTime('2016-05-31T22:52:11Z'),
+                new DateTime('2016-05-31T22:52:11Z'),
                 $this->document('<html><head><title>Example Article</title><meta name="parsely-pub-date" content="2016-05-31T22:52:11Z"></head></html>'),
                 'Valid date with tag: <meta> and name: "parsely-pub-date"'
             ],
             [
-                new \DateTime('2016-05-31T22:52:11Z'),
+                new DateTime('2016-05-31T22:52:11Z'),
                 $this->document('<html><head><title>Example Article</title><meta name="parsely-page" content=\'{"title": "Example Article","pub_date": "2016-05-31T22:52:11Z"}\'></head></html>'),
                 'Valid date with tag: <meta>, name: "parsely-page", attribute "content" and JSON parameter "pub_date"'
             ],

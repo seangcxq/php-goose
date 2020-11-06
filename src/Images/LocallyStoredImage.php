@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 1);
 
 namespace Goose\Images;
 
@@ -8,171 +8,190 @@ namespace Goose\Images;
  * @package Goose\Images
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
  */
-class LocallyStoredImage {
-    /**
-     * @param mixed[] $options
-     */
-    public function __construct($options = []) {
-        foreach ($options as $key => $value) {
-            $method = 'set' . ucfirst($key);
+class LocallyStoredImage
+{
+	/**
+	 * @param mixed[] $options
+	 */
+	public function __construct($options = [])
+	{
+		foreach($options as $key => $value)
+		{
+			$method = 'set' . ucfirst($key);
 
-            if (method_exists($this, $method)) {
-                call_user_func([$this, $method], $value);
-            }
-        }
-    }
+			if(method_exists($this, $method))
+			{
+				call_user_func([$this, $method], $value);
+			}
+		}
+	}
 
-    /**
-     * remove unnecessary tmp image files
-     */
-    public function __destruct() {
-        unlink($this->getLocalFileName());
-    }
-    
-    /** @var string */
-    private $imgSrc = '';
+	/**
+	 * remove unnecessary tmp image files
+	 */
+	public function __destruct()
+	{
+		unlink($this->getLocalFileName());
+	}
 
-    /**
-     * @param string $imgSrc
-     *
-     * @return self
-     */
-    public function setImgSrc(string $imgSrc): self {
-        $this->imgSrc = $imgSrc;
+	/** @var string */
+	private $imgSrc = '';
 
-        return $this;
-    }
+	/**
+	 * @param string $imgSrc
+	 *
+	 * @return self
+	 */
+	public function setImgSrc(string $imgSrc): self
+	{
+		$this->imgSrc = $imgSrc;
 
-    /**
-     * @return string
-     */
-    public function getImgSrc(): string {
-        return $this->imgSrc;
-    }
+		return $this;
+	}
 
-    /** @var string */
-    private $localFileName = '';
+	/**
+	 * @return string
+	 */
+	public function getImgSrc(): string
+	{
+		return $this->imgSrc;
+	}
 
-    /**
-     * @param string $localFileName
-     *
-     * @return self
-     */
-    public function setLocalFileName(string $localFileName): self {
-        $this->localFileName = $localFileName;
+	/** @var string */
+	private $localFileName = '';
 
-        return $this;
-    }
+	/**
+	 * @param string $localFileName
+	 *
+	 * @return self
+	 */
+	public function setLocalFileName(string $localFileName): self
+	{
+		$this->localFileName = $localFileName;
 
-    /**
-     * @return string
-     */
-    public function getLocalFileName(): string {
-        return $this->localFileName;
-    }
+		return $this;
+	}
 
-    /** @var string */
-    private $linkhash = '';
+	/**
+	 * @return string
+	 */
+	public function getLocalFileName(): string
+	{
+		return $this->localFileName;
+	}
 
-    /**
-     * @param string $linkhash
-     *
-     * @return self
-     */
-    public function setLinkhash(string $linkhash): self {
-        $this->linkhash = $linkhash;
+	/** @var string */
+	private $linkhash = '';
 
-        return $this;
-    }
+	/**
+	 * @param string $linkhash
+	 *
+	 * @return self
+	 */
+	public function setLinkhash(string $linkhash): self
+	{
+		$this->linkhash = $linkhash;
 
-    /**
-     * @return string
-     */
-    public function getLinkhash(): string {
-        return $this->linkhash;
-    }
+		return $this;
+	}
 
-    /** @var int */
-    private $bytes = 0;
+	/**
+	 * @return string
+	 */
+	public function getLinkhash(): string
+	{
+		return $this->linkhash;
+	}
 
-    /**
-     * @param int $bytes
-     *
-     * @return self
-     */
-    public function setBytes(int $bytes): self {
-        $this->bytes = $bytes;
+	/** @var int */
+	private $bytes = 0;
 
-        return $this;
-    }
+	/**
+	 * @param int $bytes
+	 *
+	 * @return self
+	 */
+	public function setBytes(int $bytes): self
+	{
+		$this->bytes = $bytes;
 
-    /**
-     * @return int
-     */
-    public function getBytes(): int {
-        return $this->bytes;
-    }
+		return $this;
+	}
 
-    /** @var string */
-    private $fileExtension = '';
+	/**
+	 * @return int
+	 */
+	public function getBytes(): int
+	{
+		return $this->bytes;
+	}
 
-    /**
-     * @param string $fileExtension
-     *
-     * @return self
-     */
-    public function setFileExtension(string $fileExtension): self {
-        $this->fileExtension = $fileExtension;
+	/** @var string */
+	private $fileExtension = '';
 
-        return $this;
-    }
+	/**
+	 * @param string $fileExtension
+	 *
+	 * @return self
+	 */
+	public function setFileExtension(string $fileExtension): self
+	{
+		$this->fileExtension = $fileExtension;
 
-    /**
-     * @return string
-     */
-    public function getFileExtension(): string {
-        return $this->fileExtension;
-    }
+		return $this;
+	}
 
-    /** @var int */
-    private $height = 0;
+	/**
+	 * @return string
+	 */
+	public function getFileExtension(): string
+	{
+		return $this->fileExtension;
+	}
 
-    /**
-     * @param int $height
-     *
-     * @return self
-     */
-    public function setHeight(int $height): self {
-        $this->height = $height;
+	/** @var int */
+	private $height = 0;
 
-        return $this;
-    }
+	/**
+	 * @param int $height
+	 *
+	 * @return self
+	 */
+	public function setHeight(int $height): self
+	{
+		$this->height = $height;
 
-    /**
-     * @return int
-     */
-    public function getHeight(): int {
-        return $this->height;
-    }
+		return $this;
+	}
 
-    /** @var int */
-    private $width = 0;
+	/**
+	 * @return int
+	 */
+	public function getHeight(): int
+	{
+		return $this->height;
+	}
 
-    /**
-     * @param int $width
-     *
-     * @return self
-     */
-    public function setWidth(int $width): self {
-        $this->width = $width;
+	/** @var int */
+	private $width = 0;
 
-        return $this;
-    }
+	/**
+	 * @param int $width
+	 *
+	 * @return self
+	 */
+	public function setWidth(int $width): self
+	{
+		$this->width = $width;
 
-    /**
-     * @return int
-     */
-    public function getWidth(): int {
-        return $this->width;
-    }
+		return $this;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getWidth(): int
+	{
+		return $this->width;
+	}
 }

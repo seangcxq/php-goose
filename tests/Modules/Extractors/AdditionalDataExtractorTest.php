@@ -3,10 +3,12 @@
 namespace Goose\Tests\Modules\Extractors;
 
 use Goose\Article;
+use Goose\Tests\Harness\TestTrait;
+use PHPUnit\Framework\TestCase;
 
-class AdditionalDataExtractorTest extends \PHPUnit\Framework\TestCase
+class AdditionalDataExtractorTest extends TestCase
 {
-    use \Goose\Tests\Harness\TestTrait;
+    use TestTrait;
 
     private static $CLASS_NAME = '\Goose\Modules\Extractors\AdditionalDataExtractor';
 

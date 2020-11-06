@@ -1,9 +1,9 @@
 {
-    "name": "scotteh/php-goose",
+    "name": "seangcxq/php-goose",
     "type": "library",
     "description": "Readability / Html Content / Article Extractor & Web Scrapping library written in PHP",
     "keywords": ["scraper", "http", "extractor", "text", "content", "scraping", "website", "readability"],
-    "homepage": "https://github.com/scotteh/php-goose",
+    "homepage": "https://github.com/seangcxq/php-goose",
     "license": "Apache-2.0",
     "authors": [
         {
@@ -16,7 +16,6 @@
         "ext-mbstring": "*",
         "ext-libxml": "*",
         "lib-libxml": ">=2.7.7",
-        "guzzlehttp/guzzle": "^6.0",
         "jakeasmith/http_build_url": "1.0.*",
         "scotteh/php-dom-wrapper": "^1.0"
     },

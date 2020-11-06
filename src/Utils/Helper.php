@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 1);
 
 namespace Goose\Utils;
 
@@ -10,41 +10,45 @@ use Goose\Exceptions\MalformedURLException;
  * @package Goose\Utils
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
  */
-class Helper {
-    /**
-     * @todo Re-factor result into class
-     *
-     * @param string $urlToCrawl
-     *
-     * @return object
-     */
-    public static function getCleanedUrl($urlToCrawl) {
-        $parts = parse_url($urlToCrawl);
+class Helper
+{
+	/**
+	 * @param string $urlToCrawl
+	 *
+	 * @return object
+	 * @todo Re-factor result into class
+	 *
+	 */
+	public static function getCleanedUrl($urlToCrawl)
+	{
+		$parts = parse_url($urlToCrawl);
 
-        if ($parts === false) {
-            throw new MalformedURLException($urlToCrawl . ' - is a malformed URL and cannot be processed');
-        }
+		if($parts === false)
+		{
+			throw new MalformedURLException($urlToCrawl . ' - is a malformed URL and cannot be processed');
+		}
 
-        $prefix = isset($parts['query']) && $parts['query'] ? '&' : '?';
+		$prefix = isset($parts['query']) && $parts['query'] ? '&' : '?';
 
-        $finalUrl = str_replace('#!', $prefix . '_escaped_fragment_=', $urlToCrawl);
+		$finalUrl = str_replace('#!', $prefix . '_escaped_fragment_=', $urlToCrawl);
 
-        return (object)[
-            'url' => $urlToCrawl,
-            'parts' => (object)$parts,
-            'linkhash' => md5($urlToCrawl),
-            'finalUrl' => $finalUrl,
-        ];
-    }
+		return (object)[
+			'url' => $urlToCrawl,
+			'parts' => (object)$parts,
+			'linkhash' => md5($urlToCrawl),
+			'finalUrl' => $finalUrl,
+		];
+	}
 
-    /**
-     * @param string $text
-     *
-     * @return string
-     */
-    public static function textNormalise($text) {
-        $text = preg_replace('@[\n\r\s\t]+@', " ", $text);
+	/**
+	 * @param string $text
+	 *
+	 * @return string
+	 */
+	public static function textNormalise($text)
+	{
+		$text = preg_replace('@[\n\r\s\t]+@', " ", $text);
 
-        return trim($text);
-    }
+		return trim($text);
+	}
 }

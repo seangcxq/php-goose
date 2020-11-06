@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 1);
 
 namespace Goose\Modules\Cleaners;
 
+use DOMWrap\
+{Element, NodeList, Text};
 use Goose\Article;
+use Goose\Modules\
+{AbstractModule, ModuleInterface};
 use Goose\Traits\DocumentMutatorTrait;
-use Goose\Modules\{AbstractModule, ModuleInterface};
-use DOMWrap\{Text, Element, NodeList};
 
 /**
  * Document Cleaner
@@ -13,322 +15,375 @@ use DOMWrap\{Text, Element, NodeList};
  * @package Goose\Modules\Cleaners
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
  */
-class DocumentCleaner extends AbstractModule implements ModuleInterface {
-    use DocumentMutatorTrait;
+class DocumentCleaner extends AbstractModule implements ModuleInterface
+{
+	use DocumentMutatorTrait;
 
-    /** @var array Element id/class/name to be removed that start with */
-    private $startsWithNodes = [
-        'adspot', 'conditionalAd-', 'hidden-', 'social-', 'publication', 'share-',
-        'hp-', 'ad-', 'recommended-'
-    ];
+	/** @var array Element id/class/name to be removed that start with */
+	private $startsWithNodes = [
+		'adspot', 'conditionalAd-', 'hidden-', 'social-', 'publication', 'share-',
+		'hp-', 'ad-', 'recommended-'
+	];
 
-    /** @var array Element id/class/name to be removed that equal */
-    private $equalsNodes = [
-        'side', 'links', 'inset', 'print', 'fn', 'ad',
-    ];
+	/** @var array Element id/class/name to be removed that equal */
+	private $equalsNodes = [
+		'side', 'links', 'inset', 'print', 'fn', 'ad',
+	];
 
-    /** @var array Element id/class/name to be removed that end with */
-    private $endsWithNodes = [
-        'meta'
-    ];
+	/** @var array Element id/class/name to be removed that end with */
+	private $endsWithNodes = [
+		'meta'
+	];
 
-    /** @var array Element id/class/name to be removed that contain */
-    private $searchNodes = [
-        'combx', 'retweet', 'mediaarticlerelated', 'menucontainer', 'navbar',
-        'storytopbar-bucket', 'utility-bar', 'inline-share-tools', 'comment', // not commented
-        'PopularQuestions', 'contact', 'foot', 'footer', 'Footer', 'footnote',
-        'cnn_strycaptiontxt', 'cnn_html_slideshow', 'cnn_strylftcntnt',
-        'shoutbox', 'sponsor', 'tags', 'socialnetworking', 'socialNetworking', 'scroll', // not scrollable
-        'cnnStryHghLght', 'cnn_stryspcvbx', 'pagetools', 'post-attributes',
-        'welcome_form', 'contentTools2', 'the_answers', 'communitypromo', 'promo_holder',
-        'runaroundLeft', 'subscribe', 'vcard', 'articleheadings', 'date',
-        'popup', 'author-dropdown', 'tools', 'socialtools', 'byline',
-        'konafilter', 'KonaFilter', 'breadcrumbs', 'wp-caption-text', 'source',
-        'legende', 'ajoutVideo', 'timestamp', 'js_replies', 'creative_commons', 'topics',
-        'pagination', 'mtl', 'author', 'credit', 'toc_container', 'sharedaddy',
-    ];
+	/** @var array Element id/class/name to be removed that contain */
+	private $searchNodes = [
+		'combx', 'retweet', 'mediaarticlerelated', 'menucontainer', 'navbar',
+		'storytopbar-bucket', 'utility-bar', 'inline-share-tools', 'comment', // not commented
+		'PopularQuestions', 'contact', 'foot', 'footer', 'Footer', 'footnote',
+		'cnn_strycaptiontxt', 'cnn_html_slideshow', 'cnn_strylftcntnt',
+		'shoutbox', 'sponsor', 'tags', 'socialnetworking', 'socialNetworking', 'scroll', // not scrollable
+		'cnnStryHghLght', 'cnn_stryspcvbx', 'pagetools', 'post-attributes',
+		'welcome_form', 'contentTools2', 'the_answers', 'communitypromo', 'promo_holder',
+		'runaroundLeft', 'subscribe', 'vcard', 'articleheadings', 'date',
+		'popup', 'author-dropdown', 'tools', 'socialtools', 'byline',
+		'konafilter', 'KonaFilter', 'breadcrumbs', 'wp-caption-text', 'source',
+		'legende', 'ajoutVideo', 'timestamp', 'js_replies', 'creative_commons', 'topics',
+		'pagination', 'mtl', 'author', 'credit', 'toc_container', 'sharedaddy',
+	];
 
-    /** @var array Element tagNames exempt from removal */
-    private $exceptionSelectors = [
-        'html', 'body',
-    ];
+	/** @var array Element tagNames exempt from removal */
+	private $exceptionSelectors = [
+		'html', 'body',
+	];
 
-    /**
-     * Clean the contents of the supplied article document
-     *
-     * @inheritdoc
-     */
-    public function run(Article $article): self {
-        $this->document($article->getDoc());
+	/**
+	 * Clean the contents of the supplied article document
+	 *
+	 * @inheritdoc
+	 */
+	public function run(Article $article): self
+	{
+		$this->document($article->getDoc());
 
-        $this->removeXPath('//comment()');
-        $this->replace('em, strong, b, i, strike, del, ins', function($node) {
-            return !$node->find('img')->count();
-        });
-        $this->replace('span[class~=dropcap], span[class~=drop_cap]');
-        $this->remove('script, style');
-        $this->remove('header, footer, input, form, button, aside');
-        $this->removeBadTags();
-        $this->remove("[id='caption'],[class='caption']");
-        $this->remove("[id*=' google '],[class*=' google ']");
-        $this->remove("[id*='more']:not([id^=entry-]),[class*='more']:not([class^=entry-])");
-        $this->remove("[id*='facebook']:not([id*='-facebook']),[class*='facebook']:not([class*='-facebook'])");
-        $this->remove("[id*='facebook-broadcasting'],[class*='facebook-broadcasting']");
-        $this->remove("[id*='twitter']:not([id*='-twitter']),[class*='twitter']:not([class*='-twitter'])");
-        $this->replace('span', function($node) {
-            if (is_null($node->parent())) {
-                return false;
-            }
+		$this->removeXPath('//comment()');
+		$this->replace('em, strong, b, i, strike, del, ins', function($node)
+		{
+			return !$node->find('img')->count();
+		});
+		$this->replace('span[class~=dropcap], span[class~=drop_cap]');
+		$this->remove('script, style');
+		$this->remove('header, footer, input, form, button, aside');
+		$this->removeBadTags();
+		$this->remove("[id='caption'],[class='caption']");
+		$this->remove("[id*=' google '],[class*=' google ']");
+		$this->remove("[id*='more']:not([id^=entry-]),[class*='more']:not([class^=entry-])");
+		$this->remove("[id*='facebook']:not([id*='-facebook']),[class*='facebook']:not([class*='-facebook'])");
+		$this->remove("[id*='facebook-broadcasting'],[class*='facebook-broadcasting']");
+		$this->remove("[id*='twitter']:not([id*='-twitter']),[class*='twitter']:not([class*='-twitter'])");
+		$this->replace('span', function($node)
+		{
+			if(is_null($node->parent()))
+			{
+				return false;
+			}
 
-            return $node->parent()->is('p');
-        });
-        $this->convertToParagraph('div, span, article');
+			return $node->parent()->is('p');
+		});
+		$this->convertToParagraph('div, span, article');
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * Remove via CSS selectors
-     *
-     * @param string $selector
-     * @param callable $callback
-     *
-     * @return self
-     */
-    private function remove(string $selector, callable $callback = null): self {
-        $nodes = $this->document()->find($selector);
+	/**
+	 * Remove via CSS selectors
+	 *
+	 * @param string $selector
+	 * @param callable $callback
+	 *
+	 * @return self
+	 */
+	private function remove(string $selector, callable $callback = NULL): self
+	{
+		$nodes = $this->document()->find($selector);
 
-        foreach ($nodes as $node) {
-            if (is_null($callback) || $callback($node)) {
-                $node->remove();
-            }
-        }
+		foreach($nodes as $node)
+		{
+			if(is_null($callback) || $callback($node))
+			{
+				$node->remove();
+			}
+		}
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * Remove using via XPath expressions
-     *
-     * @param string $expression
-     * @param callable $callback
-     *
-     * @return self
-     */
-    private function removeXPath(string $expression, callable $callback = null): self {
-        $nodes = $this->document()->findXPath($expression);
+	/**
+	 * Remove using via XPath expressions
+	 *
+	 * @param string $expression
+	 * @param callable $callback
+	 *
+	 * @return self
+	 */
+	private function removeXPath(string $expression, callable $callback = NULL): self
+	{
+		$nodes = $this->document()->findXPath($expression);
 
-        foreach ($nodes as $node) {
-            if (is_null($callback) || $callback($node)) {
-                $node->remove();
-            }
-        }
+		foreach($nodes as $node)
+		{
+			if(is_null($callback) || $callback($node))
+			{
+				$node->remove();
+			}
+		}
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * Replace node with its textual contents via CSS selectors
-     *
-     * @param string $selector
-     * @param callable $callback
-     *
-     * @return self
-     */
-    private function replace(string $selector, callable $callback = null): self {
-        $nodes = $this->document()->find($selector);
+	/**
+	 * Replace node with its textual contents via CSS selectors
+	 *
+	 * @param string $selector
+	 * @param callable $callback
+	 *
+	 * @return self
+	 */
+	private function replace(string $selector, callable $callback = NULL): self
+	{
+		$nodes = $this->document()->find($selector);
 
-        foreach ($nodes as $node) {
-            if (is_null($callback) || $callback($node)) {
-                $node->replaceWith(new Text((string)$node->text()));
-            }
-        }
+		foreach($nodes as $node)
+		{
+			if(is_null($callback) || $callback($node))
+			{
+				$node->replaceWith(new Text((string)$node->text()));
+			}
+		}
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * Remove unwanted junk elements based on pre-defined CSS selectors
-     *
-     * @return self
-     */
-    private function removeBadTags(): self {
-        $lists = [
-            "[%s^='%s']" => $this->startsWithNodes,
-            "[%s*='%s']" => $this->searchNodes,
-            "[%s$='%s']" => $this->endsWithNodes,
-            "[%s='%s']" => $this->equalsNodes,
-        ];
+	/**
+	 * Remove unwanted junk elements based on pre-defined CSS selectors
+	 *
+	 * @return self
+	 */
+	private function removeBadTags(): self
+	{
+		$lists = [
+			"[%s^='%s']" => $this->startsWithNodes,
+			"[%s*='%s']" => $this->searchNodes,
+			"[%s$='%s']" => $this->endsWithNodes,
+			"[%s='%s']" => $this->equalsNodes,
+		];
 
-        $attrs = [
-            'id',
-            'class',
-            'name',
-        ];
+		$attrs = [
+			'id',
+			'class',
+			'name',
+		];
 
-        $exceptions = array_map(function($value) {
-            return ':not(' . $value . ')';
-        }, $this->exceptionSelectors);
+		$exceptions = array_map(function($value)
+		{
+			return ':not(' . $value . ')';
+		}, $this->exceptionSelectors);
 
-        $exceptions = implode('', $exceptions);
+		$exceptions = implode('', $exceptions);
 
-        foreach ($lists as $expr => $list) {
-            foreach ($list as $value) {
-                foreach ($attrs as $attr) {
-                    $selector = sprintf($expr, $attr, $value) . $exceptions;
+		foreach($lists as $expr => $list)
+		{
+			foreach($list as $value)
+			{
+				foreach($attrs as $attr)
+				{
+					$selector = sprintf($expr, $attr, $value) . $exceptions;
 
-                    foreach ($this->document()->find($selector) as $node) {
-                        $node->remove();
-                    }
-                }
-            }
-        }
+					foreach($this->document()->find($selector) as $node)
+					{
+						$node->remove();
+					}
+				}
+			}
+		}
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * Replace supplied element with <p> new element.
-     *
-     * @param Element $node
-     *
-     * @return self|null
-     */
-    private function replaceElementsWithPara(Element $node): ?self {
-        // Check to see if the node no longer exist.
-        // 'Ghost' nodes have their ownerDocument property set to null - will throw a warning on access.
-        // Use another common property with isset() - won't throw any warnings.
-        if (!isset($node->nodeName)) {
-            return null;
-        }
+	/**
+	 * Replace supplied element with <p> new element.
+	 *
+	 * @param Element $node
+	 *
+	 * @return self|null
+	 */
+	private function replaceElementsWithPara(Element $node): ?self
+	{
+		// Check to see if the node no longer exist.
+		// 'Ghost' nodes have their ownerDocument property set to null - will throw a warning on access.
+		// Use another common property with isset() - won't throw any warnings.
+		if(!isset($node->nodeName))
+		{
+			return NULL;
+		}
 
-        $newEl = $this->document()->createElement('p');
+		$newEl = $this->document()->createElement('p');
 
-        $newEl->append($node->contents()->detach());
+		$newEl->append($node->contents()->detach());
 
-        foreach ($node->attributes as $attr) {
-            $newEl->attr($attr->localName, $attr->nodeValue);
-        }
+		foreach($node->attributes as $attr)
+		{
+			$newEl->attr($attr->localName, $attr->nodeValue);
+		}
 
-        $node->replaceWith($newEl);
+		$node->replaceWith($newEl);
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * Convert wanted elements to <p> elements.
-     *
-     * @param string $selector
-     *
-     * @return self
-     */
-    private function convertToParagraph(string $selector): self {
-        $nodes = $this->document()->find($selector);
+	/**
+	 * Convert wanted elements to <p> elements.
+	 *
+	 * @param string $selector
+	 *
+	 * @return self
+	 */
+	private function convertToParagraph(string $selector): self
+	{
+		$nodes = $this->document()->find($selector);
 
-        foreach ($nodes as $node) {
-            $tagNodes = $node->find('a, blockquote, dl, div, img, ol, p, pre, table, ul');
+		foreach($nodes as $node)
+		{
+			$tagNodes = $node->find('a, blockquote, dl, div, img, ol, p, pre, table, ul');
 
-            if (!$tagNodes->count()) {
-                $this->replaceElementsWithPara($node);
-            } else {
-                $replacements = $this->getReplacementNodes($node);
+			if(!$tagNodes->count())
+			{
+				$this->replaceElementsWithPara($node);
+			}
+			else
+			{
+				$replacements = $this->getReplacementNodes($node);
 
-                $node->contents()->remove();
-                $node->append($replacements);
-            }
-        }
+				$node->contents()->remove();
+				$node->append($replacements);
+			}
+		}
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * Generate new <p> element with supplied content.
-     *
-     * @param NodeList $replacementNodes
-     *
-     * @return Element
-     */
-    private function getFlushedBuffer(NodeList $replacementNodes): Element {
-        $newEl = $this->document()->createElement('p');
-        $newEl->append($replacementNodes);
+	/**
+	 * Generate new <p> element with supplied content.
+	 *
+	 * @param NodeList $replacementNodes
+	 *
+	 * @return Element
+	 */
+	private function getFlushedBuffer(NodeList $replacementNodes): Element
+	{
+		$newEl = $this->document()->createElement('p');
+		$newEl->append($replacementNodes);
 
-        return $newEl;
-    }
+		return $newEl;
+	}
 
-    /**
-     * Generate <p> element replacements for supplied elements child nodes as required.
-     *
-     * @param Element $node
-     *
-     * @return NodeList $nodesToReturn Replacement elements
-     */
-    private function getReplacementNodes(Element $node): NodeList {
-        $nodesToReturn = $node->newNodeList();
-        $nodesToRemove = $node->newNodeList();
-        $replacementNodes = $node->newNodeList();
+	/**
+	 * Generate <p> element replacements for supplied elements child nodes as required.
+	 *
+	 * @param Element $node
+	 *
+	 * @return NodeList $nodesToReturn Replacement elements
+	 */
+	private function getReplacementNodes(Element $node): NodeList
+	{
+		$nodesToReturn = $node->newNodeList();
+		$nodesToRemove = $node->newNodeList();
+		$replacementNodes = $node->newNodeList();
 
-        $fnCompareSiblingNodes = function($node) {
-            if ($node->is(':not(a)') || $node->nodeType == XML_TEXT_NODE) {
-                return true;
-            }
-        };
+		$fnCompareSiblingNodes = function($node)
+		{
+			if($node->is(':not(a)') || $node->nodeType == XML_TEXT_NODE)
+			{
+				return true;
+			}
+		};
 
-        foreach ($node->contents() as $child) {
-            if ($child->is('p') && $replacementNodes->count()) {
-                $nodesToReturn[] = $this->getFlushedBuffer($replacementNodes);
-                $replacementNodes->fromArray([]);
-                $nodesToReturn[] = $child;
-            } else if ($child->nodeType == XML_TEXT_NODE) {
-                $replaceText = $child->text();
+		foreach($node->contents() as $child)
+		{
+			if($child->is('p') && $replacementNodes->count())
+			{
+				$nodesToReturn[] = $this->getFlushedBuffer($replacementNodes);
+				$replacementNodes->fromArray([]);
+				$nodesToReturn[] = $child;
+			}
+			else
+			{
+				if($child->nodeType == XML_TEXT_NODE)
+				{
+					$replaceText = $child->text();
 
-                if (!empty($replaceText)) {
-                    // Get all previous sibling <a> nodes, the current text node, and all next sibling <a> nodes.
-                    $siblings = $child
-                        ->precedingUntil($fnCompareSiblingNodes, 'a')
-                        ->merge([$child])
-                        ->merge($child->followingUntil($fnCompareSiblingNodes, 'a'));
+					if(!empty($replaceText))
+					{
+						// Get all previous sibling <a> nodes, the current text node, and all next sibling <a> nodes.
+						$siblings = $child
+							->precedingUntil($fnCompareSiblingNodes, 'a')
+							->merge([$child])
+							->merge($child->followingUntil($fnCompareSiblingNodes, 'a'));
 
-                    foreach ($siblings as $sibling) {
-                        // Place current nodes textual contents in-between previous and next nodes.
-                        if ($sibling->isSameNode($child)) {
-                            $replacementNodes[] = new Text($replaceText);
+						foreach($siblings as $sibling)
+						{
+							// Place current nodes textual contents in-between previous and next nodes.
+							if($sibling->isSameNode($child))
+							{
+								$replacementNodes[] = new Text($replaceText);
 
-                        // Grab the contents of any unprocessed <a> siblings and flag them for removal.
-                        } else if ($sibling->getAttribute('grv-usedalready') != 'yes') {
-                            $sibling->setAttribute('grv-usedalready', 'yes');
+								// Grab the contents of any unprocessed <a> siblings and flag them for removal.
+							}
+							else
+							{
+								if($sibling->getAttribute('grv-usedalready') != 'yes')
+								{
+									$sibling->setAttribute('grv-usedalready', 'yes');
 
-                            $replacementNodes[] = $sibling->cloneNode(true);
-                            $nodesToRemove[] = $sibling;
-                        }
+									$replacementNodes[] = $sibling->cloneNode(true);
+									$nodesToRemove[] = $sibling;
+								}
+							}
 
-                    }
-                }
+						}
+					}
 
-                $nodesToRemove[] = $child;
-            } else {
-                if ($replacementNodes->count()) {
-                    $nodesToReturn[] = $this->getFlushedBuffer($replacementNodes);
-                    $replacementNodes->fromArray([]);
-                }
+					$nodesToRemove[] = $child;
+				}
+				else
+				{
+					if($replacementNodes->count())
+					{
+						$nodesToReturn[] = $this->getFlushedBuffer($replacementNodes);
+						$replacementNodes->fromArray([]);
+					}
 
-                $nodesToReturn[] = $child;
-            }
-        }
+					$nodesToReturn[] = $child;
+				}
+			}
+		}
 
-        // Flush any remaining replacementNodes left over from text nodes.
-        if ($replacementNodes->count()) {
-            $nodesToReturn[] = $this->getFlushedBuffer($replacementNodes);
-        }
+		// Flush any remaining replacementNodes left over from text nodes.
+		if($replacementNodes->count())
+		{
+			$nodesToReturn[] = $this->getFlushedBuffer($replacementNodes);
+		}
 
-        // Remove potential duplicate <a> tags.
-        foreach ($nodesToReturn as $key => $return) {
-            if ($nodesToRemove->exists($return)) {
-                unset($nodesToReturn[$key]);
-            }
-        }
+		// Remove potential duplicate <a> tags.
+		foreach($nodesToReturn as $key => $return)
+		{
+			if($nodesToRemove->exists($return))
+			{
+				unset($nodesToReturn[$key]);
+			}
+		}
 
-        $nodesToRemove->remove();
+		$nodesToRemove->remove();
 
-        return $nodesToReturn;
-    }
+		return $nodesToReturn;
+	}
 }

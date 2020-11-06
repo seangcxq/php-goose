@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 1);
 
 namespace Goose\Traits;
 
@@ -10,22 +10,25 @@ use DOMWrap\Document;
  * @package Goose\Traits
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
  */
-trait DocumentMutatorTrait {
-    /** @var Document|null */
-    protected $document;
+trait DocumentMutatorTrait
+{
+	/** @var Document|null */
+	protected $document;
 
-    /**
-     * @param Document $document
-     *
-     * @return Document|null
-     */
-    protected function document(Document $document = null): ?Document {
-        if ($document === null) {
-            return $this->document;
-        }
+	/**
+	 * @param Document $document
+	 *
+	 * @return Document|null
+	 */
+	protected function document(Document $document = NULL): ?Document
+	{
+		if($document === NULL)
+		{
+			return $this->document;
+		}
 
-        $this->document = $document;
+		$this->document = $document;
 
-        return $this->document;
-    }
+		return $this->document;
+	}
 }
