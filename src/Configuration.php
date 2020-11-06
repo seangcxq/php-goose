@@ -22,7 +22,6 @@ class Configuration
 		'image_min_height' => 120,
 		'image_fetch_best' => true,
 		'image_fetch_all' => false,
-		/** @see http://guzzle.readthedocs.io/en/stable/request-options.html */
 		'browser' => [
 			'timeout' => 60,
 			'connect_timeout' => 30,

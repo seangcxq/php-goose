@@ -5,7 +5,7 @@ namespace Goose\Images;
 use Goose\Configuration;
 use GuzzleHttp\
 {Client, Pool};
-use GuzzleHttp\Psr7\Request;
+
 use stdClass;
 
 /**
@@ -103,69 +103,8 @@ class ImageUtils
 		);
 	}
 
-	/**
-	 * @param string[] $imageSrcs
-	 * @param bool $returnAll
-	 * @param Configuration $config
-	 *
-	 * @return array|null
-	 */
 	private static function handleEntity($imageSrcs, bool $returnAll, Configuration $config): ?array
 	{
-		$guzzle = new Client();
-
-		$results = [];
-
-		$requests = function($urls) use ($guzzle, &$results)
-		{
-			foreach($urls as $key => $url)
-			{
-				$file = tempnam(sys_get_temp_dir(), 'goose');
-
-				$results[] = (object)[
-					'url' => $url,
-					'file' => $file,
-				];
-
-				yield $key => function($options) use ($guzzle, $url, $file)
-				{
-					$options['sink'] = $file;
-
-					return $guzzle->sendAsync(new Request('GET', $url), $options);
-				};
-			}
-		};
-
-		$pool = new Pool($guzzle, $requests($imageSrcs), [
-			'concurrency' => 25,
-			'fulfilled' => function($response, $index) use (&$results, $returnAll)
-			{
-				if(!$returnAll && $response->getStatusCode() != 200)
-				{
-					unset($results[$index]);
-				}
-			},
-			'rejected' => function($reason, $index) use (&$results, $returnAll)
-			{
-				if($returnAll)
-				{
-					$results[$index]->file = NULL;
-				}
-				else
-				{
-					unset($results[$index]);
-				}
-			},
-			'options' => $config->get('browser'),
-		]);
-
-		$pool->promise()->wait();
-
-		if(empty($results))
-		{
-			return NULL;
-		}
-
-		return $results;
+		return NULL;
 	}
 }
