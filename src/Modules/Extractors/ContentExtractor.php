@@ -19,6 +19,13 @@ class ContentExtractor extends AbstractModule implements ModuleInterface
 {
 	use ArticleMutatorTrait, NodeGravityTrait, NodeCommonTrait;
 
+	const MIN_STOP_WORD_COUNT   = 2;    // default: 2
+	const BOOST_SCORE_FACTOR    = 50;   // default: 50, try 20
+	const TOTAL_NODE_MOD        = 0.25; // default: 0.25
+	const MIN_NEGATIVE_SCORE    = 40;   // default: 40
+	const BOOST_SCORE_INCREMENT = 5;    // default: 5
+
+
 	/** @inheritdoc */
 	public function run(Article $article): self
 	{
@@ -45,7 +52,7 @@ class ContentExtractor extends AbstractModule implements ModuleInterface
 			$wordStats = $this->config()->getStopWords()->getStopwordCount($node->text());
 			$highLinkDensity = $this->isHighLinkDensity($node);
 
-			if($wordStats->getStopWordCount() > 2 && !$highLinkDensity)
+			if($wordStats->getStopWordCount() > self::MIN_STOP_WORD_COUNT && !$highLinkDensity)
 			{
 				$results[] = $node;
 			}
@@ -63,8 +70,8 @@ class ContentExtractor extends AbstractModule implements ModuleInterface
 	 */
 	private function getTopNodeCandidateScore(Element $node, int $i, int $totalNodes): float
 	{
-		$boostScore = (1.0 / ($i + 1)) * 50;
-		$bottomNodesForNegativeScore = $totalNodes * 0.25;
+		$boostScore = (1.0 / ($i + 1)) * self::BOOST_SCORE_FACTOR;
+		$bottomNodesForNegativeScore = $totalNodes * self::TOTAL_NODE_MOD;
 
 		if($totalNodes > 15)
 		{
@@ -73,9 +80,9 @@ class ContentExtractor extends AbstractModule implements ModuleInterface
 				$booster = $bottomNodesForNegativeScore - ($totalNodes - $i);
 				$boostScore = pow($booster, 2) * -1;
 				$negscore = abs($boostScore);
-				if($negscore > 40)
+				if($negscore > self::MIN_NEGATIVE_SCORE)
 				{
-					$boostScore = 5;
+					$boostScore = self::BOOST_SCORE_INCREMENT;
 				}
 			}
 		}

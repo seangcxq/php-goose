@@ -32,7 +32,6 @@ class AdditionalDataExtractor extends AbstractModule implements ModuleInterface
 
 		if($this->article()->getTopNode() instanceof Element)
 		{
-			$article->setVideos($this->getVideos());
 			$article->setLinks($this->getLinks());
 			$article->setPopularWords($this->getPopularWords());
 		}

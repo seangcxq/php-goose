@@ -49,18 +49,6 @@ class ImageExtractor extends AbstractModule implements ModuleInterface
 	public function run(Article $article): self
 	{
 		$this->article($article);
-
-		if($this->config()->get('image_fetch_best'))
-		{
-			$article->setTopImage($this->getBestImage());
-
-			if($this->config()->get('image_fetch_all')
-				&& $article->getTopNode() instanceof Element)
-			{
-				$article->setAllImages($this->getAllImages());
-			}
-		}
-
 		return $this;
 	}
 

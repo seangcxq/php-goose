@@ -72,7 +72,6 @@ class Client
 		$doc = $this->getDocument($raw_html);
 
 		// Set core mutators
-		$article->setFinalUrl('');
 		$article->setDomain('');
 		$article->setLinkhash($link_hash);
 		$article->setRawHtml($raw_html);
