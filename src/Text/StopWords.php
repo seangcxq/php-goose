@@ -26,6 +26,8 @@ class StopWords
 		'ru', 'sv', 'zh', 'vi'
 	];
 
+	const DEFAULT_LANGAUGE = 'en';
+
 	/**
 	 * @param Configuration $config
 	 */
@@ -61,7 +63,7 @@ class StopWords
 
 		if(!in_array($language, $this->languages))
 		{
-			$language = 'en';
+			$language = self::DEFAULT_LANGUAGE;
 		}
 		return mb_strtolower($language);
 	}
