@@ -35,6 +35,11 @@ class Article
 		return $this;
 	}
 
+	public function getFinalUrl() : string
+	{
+		return '';
+	}
+
 	/** @return string|null */
 	public function getLanguage(): ?string
 	{
